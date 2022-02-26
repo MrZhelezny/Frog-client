@@ -10,7 +10,7 @@ android {
         applicationId "com.zhelezny.frog"
         minSdk 21
         targetSdk 21
-        versionCode 2
+        versionCode 3
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -51,4 +51,7 @@ dependencies {
     implementation("androidx.navigation:navigation-fragment-ktx:2.4.1")
     implementation("androidx.navigation:navigation-ui-ktx:2.4.1")
     implementation("androidx.fragment:fragment-ktx:1.4.1")
+
+    implementation("io.ktor:ktor-client-serialization:1.6.7")
+    implementation("io.ktor:ktor-client-gson:1.6.7")
 }
