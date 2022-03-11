@@ -3,8 +3,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/menuFragment">
+    app:startDestination="@id/nicknameFragment">
 
+    <fragment
+        android:id="@+id/nicknameFragment"
+        android:name="com.zhelezny.frog.NicknameFragment"
+        android:label="fragment_nickname"
+        tools:layout="@layout/fragment_nickname" >
+        <action
+            android:id="@+id/action_nicknameFragment_to_menuFragment"
+            app:destination="@id/menuFragment" />
+    </fragment>
     <fragment
         android:id="@+id/menuFragment"
         android:name="com.zhelezny.frog.MenuFragment"
