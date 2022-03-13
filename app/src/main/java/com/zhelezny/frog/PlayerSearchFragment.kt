@@ -1,10 +1,12 @@
 package com.zhelezny.frog
 
+import android.content.Context
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.zhelezny.frog.databinding.FragmentPlayerSearchBinding
 import io.ktor.client.*
 import io.ktor.client.call.*
@@ -17,13 +19,20 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.util.*
 
-class PlayerSearchFragment: Fragment(R.layout.fragment_player_search) {
+class PlayerSearchFragment : Fragment(R.layout.fragment_player_search) {
 
     private lateinit var binding: FragmentPlayerSearchBinding
+    var searchTimer: CountDownTimer? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentPlayerSearchBinding.bind(view)
+
+
+        val pref = requireContext().getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE)
+        binding.firstPlayer.text = pref.getString(PREF_NICKNAME, "")
+
+        startTimeCounter()
 
         var string = ""
         binding.button.setOnClickListener {
@@ -57,12 +66,29 @@ class PlayerSearchFragment: Fragment(R.layout.fragment_player_search) {
 //            binding.textView.text = string
         }
 
-
+        binding.cancel.setOnClickListener {
+            searchTimer?.cancel()
+            findNavController().popBackStack()
+        }
     }
 
-    var count= 0
+    fun startTimeCounter() {
+        searchTimer = object : CountDownTimer(60000, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                binding.tvTimer.text =
+                    getString(R.string.timer, (millisUntilFinished / 1000).toString())
+            }
+
+            override fun onFinish() {
+                binding.fifthPlayer.text = "FINISH"
+            }
+        }
+        searchTimer?.start()
+    }
+
+    var count = 0
     fun gameRequest() {
-        val timer = object: CountDownTimer(60*1000, 2*1000) {
+        val timer = object : CountDownTimer(60 * 1000, 2 * 1000) {
             override fun onTick(millisUntilFinished: Long) {
                 Log.d("!!!!", "count: ${count++}")
             }

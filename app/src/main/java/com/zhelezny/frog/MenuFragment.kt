@@ -1,7 +1,11 @@
 package com.zhelezny.frog
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.View
+import android.widget.Toast
+import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.zhelezny.frog.databinding.FragmentMenuBinding
@@ -16,6 +20,17 @@ class MenuFragment: Fragment(R.layout.fragment_menu) {
 
         binding.btSearchPlayer.setOnClickListener {
             findNavController().navigate(R.id.action_menuFragment_to_playerSearchFragment)
+        }
+        var doubleBackToExitPressedOnce = false
+        val callback = requireActivity().onBackPressedDispatcher.addCallback(requireActivity()) {
+            if (doubleBackToExitPressedOnce) {
+                requireActivity().finish()
+            }
+
+            doubleBackToExitPressedOnce = true
+            Toast.makeText(requireActivity(), "Please click BACK again to exit", Toast.LENGTH_SHORT).show()
+
+            Handler(Looper.getMainLooper()).postDelayed(Runnable { doubleBackToExitPressedOnce = false }, 2000)
         }
 
     }

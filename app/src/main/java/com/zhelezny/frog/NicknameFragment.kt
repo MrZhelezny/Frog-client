@@ -8,8 +8,11 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.zhelezny.frog.databinding.FragmentNicknameBinding
 
+const val APP_PREFERENCES = "APP_PREFERENCES"
+const val PREF_NICKNAME = "PREF_NICKNAME"
 
 class NicknameFragment : Fragment(R.layout.fragment_nickname) {
 
@@ -19,12 +22,20 @@ class NicknameFragment : Fragment(R.layout.fragment_nickname) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentNicknameBinding.bind(view)
 
-        if (!isNetworkAvailable(requireContext())) {
-            Toast.makeText(requireContext(), "Отсутствует соединение с интернетом", Toast.LENGTH_LONG).show()
-        }
+        val pref = requireContext().getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE)
+        val nickname =  pref.getString(PREF_NICKNAME, "")
+        if (nickname?.isNotEmpty() == true)
+            binding.etNickname.setText(nickname)
 
         binding.btCreateNickname.setOnClickListener {
 
+            pref.edit().putString(PREF_NICKNAME, binding.etNickname.text.toString()).apply()
+
+            findNavController().navigate(R.id.action_nicknameFragment_to_menuFragment)
+        }
+
+        if (!isNetworkAvailable(requireContext())) {
+            Toast.makeText(requireContext(), "Отсутствует соединение с интернетом", Toast.LENGTH_LONG).show()
         }
     }
 
