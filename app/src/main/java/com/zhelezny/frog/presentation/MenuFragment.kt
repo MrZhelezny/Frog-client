@@ -1,4 +1,4 @@
-package com.zhelezny.frog
+package com.zhelezny.frog.presentation
 
 import android.os.Bundle
 import android.os.Handler
@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import com.zhelezny.frog.R
 import com.zhelezny.frog.databinding.FragmentMenuBinding
 
 class MenuFragment: Fragment(R.layout.fragment_menu) {

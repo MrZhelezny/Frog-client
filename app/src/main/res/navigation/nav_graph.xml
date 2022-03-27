@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/nicknameFragment"
-        android:name="com.zhelezny.frog.NicknameFragment"
+        android:name="com.zhelezny.frog.presentation.NicknameFragment"
         android:label="fragment_nickname"
         tools:layout="@layout/fragment_nickname" >
         <action
@@ -16,7 +16,7 @@
     </fragment>
     <fragment
         android:id="@+id/menuFragment"
-        android:name="com.zhelezny.frog.MenuFragment"
+        android:name="com.zhelezny.frog.presentation.MenuFragment"
         android:label="fragment_menu"
         tools:layout="@layout/fragment_menu" >
         <action
@@ -25,7 +25,7 @@
     </fragment>
     <fragment
         android:id="@+id/playerSearchFragment"
-        android:name="com.zhelezny.frog.PlayerSearchFragment"
+        android:name="com.zhelezny.frog.presentation.PlayerSearchFragment"
         android:label="fragment_player_search"
         tools:layout="@layout/fragment_player_search" />
 </navigation>

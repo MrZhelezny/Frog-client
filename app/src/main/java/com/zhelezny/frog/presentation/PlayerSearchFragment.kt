@@ -1,12 +1,14 @@
-package com.zhelezny.frog
+package com.zhelezny.frog.presentation
 
-import android.content.Context
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import com.zhelezny.frog.R
+import com.zhelezny.frog.data.repository.UserRepositoryImpl
+import com.zhelezny.frog.data.storage.SharedPrefUserStorage
 import com.zhelezny.frog.databinding.FragmentPlayerSearchBinding
 import io.ktor.client.*
 import io.ktor.client.call.*
@@ -24,13 +26,14 @@ class PlayerSearchFragment : Fragment(R.layout.fragment_player_search) {
     private lateinit var binding: FragmentPlayerSearchBinding
     var searchTimer: CountDownTimer? = null
 
+    private val userStorage by lazy { SharedPrefUserStorage(context = requireContext()) }
+    private val userRepository by lazy { UserRepositoryImpl(userStorage = userStorage) }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentPlayerSearchBinding.bind(view)
 
-
-        val pref = requireContext().getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE)
-        binding.firstPlayer.text = pref.getString(PREF_NICKNAME, "")
+        binding.firstPlayer.text = userRepository.get().nickName
 
         startTimeCounter()
 
@@ -40,7 +43,7 @@ class PlayerSearchFragment : Fragment(R.layout.fragment_player_search) {
                 val client = HttpClient(Android) {
                     install(JsonFeature)
                 }
-                val response: HttpResponse = client.get("http://192.168.100.18:8080/api/") {
+                val response: HttpResponse = client.get("http://192.168.100.122:8080/api/") {
 //                    method = HttpMethod.Post
 
                     parameter("user", UUID.randomUUID().toString())
