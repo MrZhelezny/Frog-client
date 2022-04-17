@@ -27,5 +27,13 @@
         android:id="@+id/playerSearchFragment"
         android:name="com.zhelezny.frog.presentation.PlayerSearchFragment"
         android:label="fragment_player_search"
-        tools:layout="@layout/fragment_player_search" />
+        tools:layout="@layout/fragment_player_search" >
+        <action
+            android:id="@+id/action_playerSearchFragment_to_gameFieldFragment"
+            app:destination="@id/gameFieldFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/gameFieldFragment"
+        android:name="com.zhelezny.frog.presentation.GameFieldFragment"
+        android:label="GameFieldFragment" />
 </navigation>

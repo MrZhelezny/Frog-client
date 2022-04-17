@@ -10,18 +10,29 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.zhelezny.frog.R
+import com.zhelezny.frog.data.repository.KtorRepositoryImpl
 import com.zhelezny.frog.data.repository.UserRepositoryImpl
 import com.zhelezny.frog.data.storage.SharedPrefUserStorage
 import com.zhelezny.frog.data.storage.models.User
 import com.zhelezny.frog.data.storage.models.UserStatus
 import com.zhelezny.frog.databinding.FragmentNicknameBinding
+import com.zhelezny.frog.domain.usecases.GetUidFromServerUseCase
+import com.zhelezny.frog.domain.usecases.SaveUserUseCase
 
 class NicknameFragment : Fragment(R.layout.fragment_nickname) {
 
     private lateinit var binding: FragmentNicknameBinding
 
-    private val userStorage by lazy { SharedPrefUserStorage(requireActivity()) }
-    private val userRepository by lazy { UserRepositoryImpl(userStorage = userStorage) }
+    private val userRepository by lazy {
+        UserRepositoryImpl(
+            userStorage = SharedPrefUserStorage(
+                requireActivity()
+            )
+        )
+    }
+    private val saveUserUseCase by lazy { SaveUserUseCase(userRepository) }
+
+    private val getUidFromServerUserUseCase = GetUidFromServerUseCase(KtorRepositoryImpl())
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -32,7 +43,8 @@ class NicknameFragment : Fragment(R.layout.fragment_nickname) {
             binding.etNickname.setText(nickname)
 
         binding.btCreateNickname.setOnClickListener {
-            userRepository.save(User("id", binding.etNickname.text.toString(), UserStatus.ONLINE))
+            val id = getUidFromServerUserUseCase.execute(binding.etNickname.text.toString())
+            saveUserUseCase.execute(User(id, binding.etNickname.text.toString(), UserStatus.ONLINE))
 
             findNavController().navigate(R.id.action_nicknameFragment_to_menuFragment)
         }

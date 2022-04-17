@@ -2,80 +2,60 @@ package com.zhelezny.frog.presentation
 
 import android.os.Bundle
 import android.os.CountDownTimer
-import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.zhelezny.frog.R
+import com.zhelezny.frog.data.repository.KtorRepositoryImpl
 import com.zhelezny.frog.data.repository.UserRepositoryImpl
 import com.zhelezny.frog.data.storage.SharedPrefUserStorage
 import com.zhelezny.frog.databinding.FragmentPlayerSearchBinding
+import com.zhelezny.frog.domain.usecases.GameRequestUseCase
+import com.zhelezny.frog.domain.usecases.GetUserUseCase
 import io.ktor.client.*
-import io.ktor.client.call.*
 import io.ktor.client.engine.android.*
-import io.ktor.client.features.json.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import java.util.*
 
 class PlayerSearchFragment : Fragment(R.layout.fragment_player_search) {
 
     private lateinit var binding: FragmentPlayerSearchBinding
-    var searchTimer: CountDownTimer? = null
+    private var searchTimer: CountDownTimer? = null
+    private var gameRequestsTimer: CountDownTimer? = null
+    private var countRequest = 0
 
-    private val userStorage by lazy { SharedPrefUserStorage(context = requireContext()) }
-    private val userRepository by lazy { UserRepositoryImpl(userStorage = userStorage) }
+    private val userRepository by lazy {
+        UserRepositoryImpl(
+            userStorage = SharedPrefUserStorage(
+                context = requireContext()
+            )
+        )
+    }
+    private val getUserUseCase by lazy { GetUserUseCase(userRepository) }
+
+    private val gameRequestUseCase = GameRequestUseCase(KtorRepositoryImpl())
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentPlayerSearchBinding.bind(view)
 
-        binding.firstPlayer.text = userRepository.get().nickName
-
-        startTimeCounter()
-
-        var string = ""
-        binding.button.setOnClickListener {
-            GlobalScope.launch {
-                val client = HttpClient(Android) {
-                    install(JsonFeature)
-                }
-                val response: HttpResponse = client.get("http://192.168.100.122:8080/api/") {
-//                    method = HttpMethod.Post
-
-                    parameter("user", UUID.randomUUID().toString())
-
-//                    body = UUID.randomUUID().toString()
-//                    contentType(ContentType.Application.Json)
-//                    body = User(UUID.randomUUID().toString(), UserStatus.ONLINE)
-                }
-                println(response.status)
-                val byteArrayBody: ByteArray = response.receive()
-                string = String(byteArrayBody)
-                println(string)
-
-                client.close()
-
-            }
-            binding.textView.text = string
-//            val response = createRequest()
-//            println(response.status)
-////            val byteArrayBody: ByteArray = response.receive()
-////            string = String(byteArrayBody)
-////            println(string)
-//            binding.textView.text = string
-        }
+        val nickname = getUserUseCase.execute().nickName
+        binding.firstPlayer.text = nickname
 
         binding.cancel.setOnClickListener {
             searchTimer?.cancel()
+            gameRequestsTimer?.cancel()
             findNavController().popBackStack()
         }
+
+        startTimeCounter()
+        gameRequest(nickname = nickname)
     }
 
-    fun startTimeCounter() {
+    private fun startTimeCounter() {
         searchTimer = object : CountDownTimer(60000, 1000) {
             override fun onTick(millisUntilFinished: Long) {
                 binding.tvTimer.text =
@@ -89,18 +69,22 @@ class PlayerSearchFragment : Fragment(R.layout.fragment_player_search) {
         searchTimer?.start()
     }
 
-    var count = 0
-    fun gameRequest() {
-        val timer = object : CountDownTimer(60 * 1000, 2 * 1000) {
+    private fun gameRequest(nickname: String) {
+        gameRequestsTimer = object : CountDownTimer(60 * 1000, 2 * 1000) {
             override fun onTick(millisUntilFinished: Long) {
-                Log.d("!!!!", "count: ${count++}")
+                val resultRequest = gameRequestUseCase.execute(nickname)
+                binding.textView.text = "$resultRequest Запрос №${countRequest++}"
+                if (resultRequest == "Нанчинаем игру!") {
+                    findNavController().navigate(R.id.action_playerSearchFragment_to_gameFieldFragment)
+                    cancel()
+                }
             }
 
             override fun onFinish() {
-                count = 0
+                countRequest = 0
             }
         }
-        timer.start()
+        gameRequestsTimer?.start()
     }
 
     fun createRequest(): HttpResponse {
