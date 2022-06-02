@@ -10,40 +10,33 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.zhelezny.frog.R
-import com.zhelezny.frog.data.repository.KtorRepositoryImpl
-import com.zhelezny.frog.data.repository.UserRepositoryImpl
-import com.zhelezny.frog.data.storage.SharedPrefUserStorage
 import com.zhelezny.frog.data.storage.models.User
 import com.zhelezny.frog.data.storage.models.UserStatus
 import com.zhelezny.frog.databinding.FragmentNicknameBinding
+import com.zhelezny.frog.domain.repository.UserRepository
 import com.zhelezny.frog.domain.usecases.GetUidFromServerUseCase
 import com.zhelezny.frog.domain.usecases.SaveUserUseCase
+import org.koin.android.ext.android.inject
 
 class NicknameFragment : Fragment(R.layout.fragment_nickname) {
 
     private lateinit var binding: FragmentNicknameBinding
 
-    private val userRepository by lazy {
-        UserRepositoryImpl(
-            userStorage = SharedPrefUserStorage(
-                requireActivity()
-            )
-        )
-    }
-    private val saveUserUseCase by lazy { SaveUserUseCase(userRepository) }
-
-    private val getUidFromServerUserUseCase = GetUidFromServerUseCase(KtorRepositoryImpl())
+    private val userRepository: UserRepository by inject()
+    private val saveUserUseCase: SaveUserUseCase by inject()
+    private val getUidFromServerUserUseCase: GetUidFromServerUseCase by inject()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentNicknameBinding.bind(view)
 
-        val nickname = userRepository.get().nickName
+        val savedUser = userRepository.get()
+        val nickname = savedUser.nickName
         if (nickname.isNotEmpty())
             binding.etNickname.setText(nickname)
 
         binding.btCreateNickname.setOnClickListener {
-            val id = getUidFromServerUserUseCase.execute(binding.etNickname.text.toString())
+            val id = getUidFromServerUserUseCase.execute(binding.etNickname.text.toString() + savedUser.id)
             saveUserUseCase.execute(User(id, binding.etNickname.text.toString(), UserStatus.ONLINE))
 
             findNavController().navigate(R.id.action_nicknameFragment_to_menuFragment)
