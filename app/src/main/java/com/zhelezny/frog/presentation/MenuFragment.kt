@@ -11,7 +11,7 @@ import androidx.navigation.fragment.findNavController
 import com.zhelezny.frog.R
 import com.zhelezny.frog.databinding.FragmentMenuBinding
 
-class MenuFragment: Fragment(R.layout.fragment_menu) {
+class MenuFragment : Fragment(R.layout.fragment_menu) {
 
     private lateinit var binding: FragmentMenuBinding
 
@@ -22,6 +22,12 @@ class MenuFragment: Fragment(R.layout.fragment_menu) {
         binding.btSearchPlayer.setOnClickListener {
             findNavController().navigate(R.id.action_menuFragment_to_playerSearchFragment)
         }
+
+        doubleClickToExit()
+    }
+
+    private fun doubleClickToExit() {
+
         var doubleBackToExitPressedOnce = false
         val callback = requireActivity().onBackPressedDispatcher.addCallback(requireActivity()) {
             if (doubleBackToExitPressedOnce) {
@@ -33,6 +39,5 @@ class MenuFragment: Fragment(R.layout.fragment_menu) {
 
             Handler(Looper.getMainLooper()).postDelayed(Runnable { doubleBackToExitPressedOnce = false }, 2000)
         }
-
     }
 }

@@ -6,5 +6,7 @@ interface KtorRepository {
 
     fun getUid(nickName: String): String
 
-    fun gameRequest(nickName: String): Flow<String>
+    fun joinGame(nickName: String): Flow<List<String>>
+
+    fun startGame(nickName: String): Flow<String>
 }
