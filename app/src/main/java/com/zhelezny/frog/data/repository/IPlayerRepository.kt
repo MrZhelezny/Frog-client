@@ -5,7 +5,9 @@ import com.google.gson.Gson
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
-import com.zhelezny.frog.domain.repository.KtorRepository
+import com.zhelezny.frog.data.storage.PlayerStorage
+import com.zhelezny.frog.data.storage.models.User
+import com.zhelezny.frog.domain.repository.PlayerRepository
 import io.ktor.client.*
 import io.ktor.client.plugins.websocket.*
 import io.ktor.http.*
@@ -17,11 +19,19 @@ import java.lang.reflect.Type
 import java.util.*
 
 
-class KtorRepositoryImpl : KtorRepository {
+class IPlayerRepository(private val playerStorage: PlayerStorage) : PlayerRepository {
 
     private val TAG = "KtorRepositoryImpl"
     val gson = Gson()
     val json = JsonObject()
+
+    override fun saveNickNamePlayer(user: User) {
+        playerStorage.save(user)
+    }
+
+    override fun get(): User {
+        TODO("Not yet implemented")
+    }
 
     override fun getUid(nickName: String): String {
         lateinit var id: String
@@ -49,7 +59,8 @@ class KtorRepositoryImpl : KtorRepository {
         return id
     }
 
-    override fun joinGame(nickName: String): Flow<List<String>> = flow {
+    override fun getCurrentPlayers(nickName: String): Flow<List<String>> = flow {
+
         val client = HttpClient {
             install(WebSockets)
         }
@@ -120,7 +131,7 @@ class KtorRepositoryImpl : KtorRepository {
     }
 
     companion object {
-        private const val HOST_ADDRESS = "192.168.100.139"
+        private const val HOST_ADDRESS = "0.0.0.0"
         private const val PORT = 8080
     }
 }

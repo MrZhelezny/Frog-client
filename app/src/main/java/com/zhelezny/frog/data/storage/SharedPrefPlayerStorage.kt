@@ -9,7 +9,7 @@ private const val PREF_ID = "PREF_ID"
 private const val PREF_NICKNAME = "PREF_NICKNAME"
 private const val DEFAULT_PARAM = "defaultParam"
 
-class SharedPrefUserStorage(context: Context) : UserStorage {
+class SharedPrefPlayerStorage(context: Context) : PlayerStorage {
 
     private val pref = context.getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE)
 

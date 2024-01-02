@@ -1,11 +1,11 @@
 package com.zhelezny.frog.domain.usecases
 
 import com.zhelezny.frog.data.storage.models.User
-import com.zhelezny.frog.domain.repository.UserRepository
+import com.zhelezny.frog.domain.repository.PlayerRepository
 
-class SaveUserUseCase(private val userRepo: UserRepository) {
+class SaveUserUseCase(private val userRepo: PlayerRepository) {
 
     fun execute(user: User) {
-        userRepo.save(user)
+        userRepo.saveNickNamePlayer(user)
     }
 }

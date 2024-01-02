@@ -6,6 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:background="@android:color/darker_gray"
+    android:layout_gravity="center_vertical"
     tools:context="com.zhelezny.frog.presentation.MenuFragment">
 
     <ImageView
@@ -24,41 +25,17 @@
         android:layout_marginTop="60dp"
         android:text="НАЧАТЬ ИГРУ"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/iv_logo" />
-
-    <Button
-        android:id="@+id/bt_create_game_field"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:text="СОЗДАТЬ КАРТУ"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.495"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/bt_search_player" />
-
-    <Button
-        android:id="@+id/bt_join_game"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:text="ПРИСОЕДЕНИТЬСЯ К ИГРЕ"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/bt_create_game_field" />
 
     <Button
         android:id="@+id/bt_settings"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
         android:text="НАСТРОЙКИ"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/bt_join_game" />
+        app:layout_constraintTop_toBottomOf="@+id/bt_search_player" />
 
     <Button
         android:id="@+id/bt_rules_and_tips"

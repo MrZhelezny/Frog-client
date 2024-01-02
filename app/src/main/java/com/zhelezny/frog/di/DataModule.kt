@@ -1,24 +1,18 @@
 package com.zhelezny.frog.di
 
-import com.zhelezny.frog.data.repository.KtorRepositoryImpl
-import com.zhelezny.frog.data.repository.UserRepositoryImpl
-import com.zhelezny.frog.data.storage.SharedPrefUserStorage
-import com.zhelezny.frog.data.storage.UserStorage
-import com.zhelezny.frog.domain.repository.KtorRepository
-import com.zhelezny.frog.domain.repository.UserRepository
+import com.zhelezny.frog.data.repository.IPlayerRepository
+import com.zhelezny.frog.data.storage.PlayerStorage
+import com.zhelezny.frog.data.storage.SharedPrefPlayerStorage
+import com.zhelezny.frog.domain.repository.PlayerRepository
 import org.koin.dsl.module
 
 val dataModule = module {
 
-    single<UserStorage> {
-        SharedPrefUserStorage(context = get())
+    single<PlayerStorage> {
+        SharedPrefPlayerStorage(context = get())
     }
 
-    single<UserRepository> {
-        UserRepositoryImpl(userStorage = get())
-    }
-
-    single<KtorRepository> {
-        KtorRepositoryImpl()
+    single<PlayerRepository> {
+        IPlayerRepository(playerStorage = get())
     }
 }

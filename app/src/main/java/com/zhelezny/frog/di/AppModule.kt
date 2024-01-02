@@ -6,7 +6,7 @@ import org.koin.dsl.module
 
 val appModule = module {
 
-    viewModel<PlayerSearchViewModel> {
-        PlayerSearchViewModel(joinGameUseCase = get())
+    viewModel {
+        PlayerSearchViewModel(joinGameUseCase = get(), getUserUseCase = get())
     }
 }

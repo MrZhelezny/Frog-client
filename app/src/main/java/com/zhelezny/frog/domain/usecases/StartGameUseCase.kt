@@ -1,11 +1,11 @@
 package com.zhelezny.frog.domain.usecases
 
-import com.zhelezny.frog.domain.repository.KtorRepository
+import com.zhelezny.frog.domain.repository.PlayerRepository
 import kotlinx.coroutines.flow.Flow
 
-class StartGameUseCase(private val ktorRepository: KtorRepository) {
+class StartGameUseCase(private val playerRepository: PlayerRepository) {
 
-    fun execute(nickName: String): Flow<String> {
-        return ktorRepository.startGame(nickName)
+    fun connect(nickName: String): Flow<String> {
+        return playerRepository.startGame(nickName)
     }
 }

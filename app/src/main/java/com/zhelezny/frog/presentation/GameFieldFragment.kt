@@ -6,22 +6,19 @@ import android.os.Bundle
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.lifecycleScope
 import com.zhelezny.frog.R
-import com.zhelezny.frog.data.repository.KtorRepositoryImpl
 import com.zhelezny.frog.databinding.FragmentGameFieldBinding
-import com.zhelezny.frog.domain.repository.KtorRepository
 import com.zhelezny.frog.domain.usecases.StartGameUseCase
 import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
 
 class GameFieldFragment : Fragment(R.layout.fragment_game_field) {
 
     private lateinit var binding: FragmentGameFieldBinding
     private lateinit var color: String
 
-    private val repository = KtorRepositoryImpl()
-    private val startGameUseCase = StartGameUseCase(repository)
+    private val startGameUseCase: StartGameUseCase by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,7 +30,7 @@ class GameFieldFragment : Fragment(R.layout.fragment_game_field) {
         binding = FragmentGameFieldBinding.bind(view)
         setYourColor(color)
         viewLifecycleOwner.lifecycleScope.launch {
-            startGameUseCase.execute("123").collect{
+            startGameUseCase.connect("123").collect {
 
             }
         }

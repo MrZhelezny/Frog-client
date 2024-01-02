@@ -8,19 +8,19 @@ import org.koin.dsl.module
 
 val domainModule = module {
 
-    factory<SaveUserUseCase> {
+    factory {
         SaveUserUseCase(userRepo = get())
     }
 
-    factory<GetUserUseCase> {
+    factory {
         GetUserUseCase(userRepo = get())
     }
 
-    factory<GetUidFromServerUseCase> {
+    factory {
         GetUidFromServerUseCase(ktorRepo = get())
     }
 
-    factory<JoinGameSessionUseCase> {
-        JoinGameSessionUseCase(ktorRepository = get())
+    factory {
+        JoinGameSessionUseCase(playerRepository = get())
     }
 }

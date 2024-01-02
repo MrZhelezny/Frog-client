@@ -4,11 +4,15 @@ import android.os.CountDownTimer
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.google.gson.Gson
-import com.google.gson.JsonObject
+import androidx.lifecycle.viewModelScope
+import com.zhelezny.frog.domain.usecases.GetUserUseCase
 import com.zhelezny.frog.domain.usecases.JoinGameSessionUseCase
+import kotlinx.coroutines.launch
 
-class PlayerSearchViewModel(private val joinGameUseCase: JoinGameSessionUseCase) : ViewModel() {
+class PlayerSearchViewModel(
+    private val joinGameUseCase: JoinGameSessionUseCase,
+    private val getUserUseCase: GetUserUseCase
+) : ViewModel() {
 
     private val playerListMutable = MutableLiveData<List<String>>()
     val playerListLive: LiveData<List<String>> = playerListMutable
@@ -16,18 +20,22 @@ class PlayerSearchViewModel(private val joinGameUseCase: JoinGameSessionUseCase)
     private val timerDataMutable = MutableLiveData<String>()
     val timerData: LiveData<String> = timerDataMutable
 
-    val gson = Gson()
-    val json = JsonObject()
-
     init {
         startTimeCounter()
+        getWaitingPlayers()
     }
 
-    suspend fun joinGame(nickname: String) {
-        joinGameUseCase.execute(nickname).collect {
-//            val list = gson.fromJson(it, ArrayList::class.java)
-            playerListMutable.postValue(it)
+    private fun getWaitingPlayers() {
+        viewModelScope.launch {
+            // получаем имя игрока
+            val nickname = getUserUseCase.execute().nickName
+
+            // подписываемся на список игроков в ожидании для отображения на экране
+            joinGameUseCase.currentPlayers(nickname).collect { namesList ->
+                playerListMutable.postValue(namesList)
+            }
         }
+
     }
 
     private fun startTimeCounter() {

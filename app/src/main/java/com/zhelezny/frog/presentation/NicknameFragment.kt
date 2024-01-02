@@ -13,7 +13,7 @@ import com.zhelezny.frog.R
 import com.zhelezny.frog.data.storage.models.User
 import com.zhelezny.frog.data.storage.models.UserStatus
 import com.zhelezny.frog.databinding.FragmentNicknameBinding
-import com.zhelezny.frog.domain.repository.UserRepository
+import com.zhelezny.frog.domain.repository.PlayerRepository
 import com.zhelezny.frog.domain.usecases.GetUidFromServerUseCase
 import com.zhelezny.frog.domain.usecases.SaveUserUseCase
 import org.koin.android.ext.android.inject
@@ -22,7 +22,8 @@ class NicknameFragment : Fragment(R.layout.fragment_nickname) {
 
     private lateinit var binding: FragmentNicknameBinding
 
-    private val userRepository: UserRepository by inject()
+    //TODO: перенести SaveUserUseCase и GetUidFromServerUseCase во viewModel
+    private val playerRepo: PlayerRepository by inject()
     private val saveUserUseCase: SaveUserUseCase by inject()
     private val getUidFromServerUserUseCase: GetUidFromServerUseCase by inject()
 
@@ -30,7 +31,7 @@ class NicknameFragment : Fragment(R.layout.fragment_nickname) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentNicknameBinding.bind(view)
 
-        val savedUser = userRepository.get()
+        val savedUser = playerRepo.get()
         val nickname = savedUser.nickName
         if (nickname.isNotEmpty())
             binding.etNickname.setText(nickname)
