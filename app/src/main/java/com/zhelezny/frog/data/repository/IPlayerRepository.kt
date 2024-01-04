@@ -1,6 +1,8 @@
 package com.zhelezny.frog.data.repository
 
 import android.util.Log
+import android.widget.Toast
+import androidx.core.content.ContentProviderCompat.requireContext
 import com.google.gson.Gson
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
@@ -16,12 +18,13 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.runBlocking
 import java.lang.reflect.Type
+import java.net.ConnectException
 import java.util.*
 
 
 class IPlayerRepository(private val playerStorage: PlayerStorage) : PlayerRepository {
 
-    private val TAG = "KtorRepositoryImpl"
+    private val TAG = "IPlayerRepository"
     val gson = Gson()
     val json = JsonObject()
 
@@ -30,7 +33,7 @@ class IPlayerRepository(private val playerStorage: PlayerStorage) : PlayerReposi
     }
 
     override fun get(): User {
-        TODO("Not yet implemented")
+        return playerStorage.get()
     }
 
     override fun getUid(nickName: String): String {
@@ -60,44 +63,46 @@ class IPlayerRepository(private val playerStorage: PlayerStorage) : PlayerReposi
     }
 
     override fun getCurrentPlayers(nickName: String): Flow<List<String>> = flow {
-
-        val client = HttpClient {
-            install(WebSockets)
-        }
-        client.webSocket(
-            method = HttpMethod.Get,
-            host = HOST_ADDRESS,
-            port = PORT,
-            path = "/joinGame"
-        ) {
-            try {
-                Log.d(TAG, "Отправка nickName: $nickName")
-                send(nickName)
-                for (message in incoming) {
-                    message as? Frame.Text ?: continue
-                    Log.d(TAG, "Входящее сообщение: ${message.readText()}")
-                    val element: JsonElement = gson.fromJson(message.readText(), JsonElement::class.java)
-                    val jsonObj = element.asJsonObject
-                    val list = jsonObj.getAsJsonArray("name")
-                    val listType: Type = object : TypeToken<List<String?>?>() {}.type
-                    val target: MutableList<String> = LinkedList<String>()
-                    target.add("blah")
-                    val listStr = mutableListOf<String>()
-                    list.forEach{
-                        listStr.add(it.toString())
-                    }
-                    emit(listStr)
-                    Log.d(TAG, "emitим значения во Flow")
-                    if (message.readText().startsWith("Color")) {
-                        client.close()
-                    }
-                }
-            } catch (e: Exception) {
-                println("Error while receiving: " + e.localizedMessage)
+        try {
+            val client = HttpClient {
+                install(WebSockets)
             }
-        }
-        Log.d(TAG, "joinGame END")
+            client.webSocket(method = HttpMethod.Get, host = HOST_ADDRESS, port = PORT, path = "/joinGame") {
+                try {
+                    Log.d(TAG, "Отправка nickName: $nickName")
+                    send(nickName)
+                    for (message in incoming) {
+                        message as? Frame.Text ?: continue
+                        Log.d(TAG, "Входящее сообщение: ${message.readText()}")
+                        val element: JsonElement = gson.fromJson(message.readText(), JsonElement::class.java)
+                        val jsonObj = element.asJsonObject
+                        val list = jsonObj.getAsJsonArray("name")
+                        val listType: Type = object : TypeToken<List<String?>?>() {}.type
+                        val target: MutableList<String> = LinkedList<String>()
+                        target.add("blah")
+                        val listStr = mutableListOf<String>()
+                        list.forEach {
+                            listStr.add(it.toString())
+                        }
+                        emit(listStr)
+                        Log.d(TAG, "emitим значения во Flow")
+                        if (message.readText().startsWith("Color")) {
+                            client.close()
+                        }
+                    }
+                } catch (e: Exception) {
+                    println("Error while receiving: " + e.localizedMessage)
+                }
+            }
+            Log.d(TAG, "joinGame END")
 //        client.close()
+        } catch (e: ConnectException) {
+            Log.d(TAG, e.message, e)
+//            Toast.makeText(requireContext(), "Ошибка подключения к серверу игры", Toast.LENGTH_LONG).show()
+
+        } catch (e: Exception) {
+            Log.d(TAG, e.message, e)
+        }
     }
 
     override fun startGame(nickName: String): Flow<String> = flow {

@@ -7,7 +7,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zhelezny.frog.domain.usecases.GetUserUseCase
 import com.zhelezny.frog.domain.usecases.JoinGameSessionUseCase
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 
 class PlayerSearchViewModel(
     private val joinGameUseCase: JoinGameSessionUseCase,
@@ -21,20 +23,18 @@ class PlayerSearchViewModel(
     val timerData: LiveData<String> = timerDataMutable
 
     init {
-        startTimeCounter()
         getWaitingPlayers()
     }
 
     private fun getWaitingPlayers() {
-        viewModelScope.launch {
-            // получаем имя игрока
-            val nickname = getUserUseCase.execute().nickName
+        // получаем имя игрока
+        val nickname = getUserUseCase.user.nickName
 
-            // подписываемся на список игроков в ожидании для отображения на экране
-            joinGameUseCase.currentPlayers(nickname).collect { namesList ->
-                playerListMutable.postValue(namesList)
-            }
-        }
+        // подписываемся на список игроков в ожидании для отображения на экране
+        joinGameUseCase.currentPlayers(nickname)
+            .onStart { startTimeCounter() }
+            .onEach { playerListMutable.postValue(it) }
+            .launchIn(viewModelScope)
 
     }
 
