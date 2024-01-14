@@ -1,32 +1,27 @@
 package com.zhelezny.frog.data.repository
 
 import android.util.Log
-import android.widget.Toast
-import androidx.core.content.ContentProviderCompat.requireContext
-import com.google.gson.Gson
-import com.google.gson.JsonElement
-import com.google.gson.JsonObject
-import com.google.gson.reflect.TypeToken
 import com.zhelezny.frog.data.storage.PlayerStorage
+import com.zhelezny.frog.data.storage.models.PlayerName
 import com.zhelezny.frog.data.storage.models.User
 import com.zhelezny.frog.domain.repository.PlayerRepository
-import io.ktor.client.*
-import io.ktor.client.plugins.websocket.*
-import io.ktor.http.*
-import io.ktor.websocket.*
+import io.ktor.client.HttpClient
+import io.ktor.client.plugins.websocket.WebSockets
+import io.ktor.client.plugins.websocket.webSocket
+import io.ktor.http.HttpMethod
+import io.ktor.websocket.Frame
+import io.ktor.websocket.readText
+import io.ktor.websocket.send
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.runBlocking
-import java.lang.reflect.Type
+import kotlinx.serialization.json.Json
 import java.net.ConnectException
-import java.util.*
 
 
 class IPlayerRepository(private val playerStorage: PlayerStorage) : PlayerRepository {
 
     private val TAG = "IPlayerRepository"
-    val gson = Gson()
-    val json = JsonObject()
 
     override fun saveNickNamePlayer(user: User) {
         playerStorage.save(user)
@@ -74,17 +69,9 @@ class IPlayerRepository(private val playerStorage: PlayerStorage) : PlayerReposi
                     for (message in incoming) {
                         message as? Frame.Text ?: continue
                         Log.d(TAG, "Входящее сообщение: ${message.readText()}")
-                        val element: JsonElement = gson.fromJson(message.readText(), JsonElement::class.java)
-                        val jsonObj = element.asJsonObject
-                        val list = jsonObj.getAsJsonArray("name")
-                        val listType: Type = object : TypeToken<List<String?>?>() {}.type
-                        val target: MutableList<String> = LinkedList<String>()
-                        target.add("blah")
-                        val listStr = mutableListOf<String>()
-                        list.forEach {
-                            listStr.add(it.toString())
-                        }
-                        emit(listStr)
+
+                        val playerName = Json.decodeFromString<List<PlayerName>>(message.readText())
+                        emit(playerName.map { it.nickname })
                         Log.d(TAG, "emitим значения во Flow")
                         if (message.readText().startsWith("Color")) {
                             client.close()
@@ -136,7 +123,7 @@ class IPlayerRepository(private val playerStorage: PlayerStorage) : PlayerReposi
     }
 
     companion object {
-        private const val HOST_ADDRESS = "0.0.0.0"
-        private const val PORT = 8080
+        private const val HOST_ADDRESS = "192.168.0.108"
+        private const val PORT = 22222
     }
 }

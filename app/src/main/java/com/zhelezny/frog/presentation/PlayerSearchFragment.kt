@@ -40,6 +40,7 @@ class PlayerSearchFragment : Fragment(R.layout.fragment_player_search) {
 
         binding.btCancel.setOnClickListener {
             findNavController().popBackStack()
+            //TODO: cancel game
         }
 
         searchViewModel.playerListLive.observe(requireActivity()) {
