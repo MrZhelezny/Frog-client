@@ -16,12 +16,15 @@
     </fragment>
     <fragment
         android:id="@+id/menuFragment"
-        android:name="com.zhelezny.frog.presentation.MenuFragment"
+        android:name="com.zhelezny.frog.presentation.menu.MenuFragment"
         android:label="fragment_menu"
         tools:layout="@layout/fragment_menu" >
         <action
             android:id="@+id/action_menuFragment_to_playerSearchFragment"
             app:destination="@id/playerSearchFragment" />
+        <action
+            android:id="@+id/action_menuFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
     </fragment>
     <fragment
         android:id="@+id/playerSearchFragment"
@@ -36,4 +39,13 @@
         android:id="@+id/gameFieldFragment"
         android:name="com.zhelezny.frog.presentation.GameFieldFragment"
         android:label="GameFieldFragment" />
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.zhelezny.frog.presentation.SettingsFragment"
+        android:label="SettingsFragment" >
+        <action
+            android:id="@+id/action_settingsFragment_pop"
+            app:popUpTo="@id/settingsFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
 </navigation>

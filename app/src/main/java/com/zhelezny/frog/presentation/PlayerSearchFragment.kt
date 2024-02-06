@@ -3,6 +3,7 @@ package com.zhelezny.frog.presentation
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.zhelezny.frog.R
@@ -44,13 +45,17 @@ class PlayerSearchFragment : Fragment(R.layout.fragment_player_search) {
         }
 
         searchViewModel.playerListLive.observe(requireActivity()) {
+            if (it[0].startsWith("Color")) {
+                val color = it[0].split(" ")[1]
+                findNavController().navigate(
+                    R.id.action_playerSearchFragment_to_gameFieldFragment,
+                    bundleOf("bundleColorKey" to color)
+                )
+            }
+
             for (i in it.indices) {
                 tvNames[i].text = it[i]
             }
-//            if (user[0] == "Color") {
-//                val color = user[1]
-//                findNavController().navigate(R.id.action_playerSearchFragment_to_gameFieldFragment, bundleOf("bundleColorKey" to color))
-//            }
         }
     }
 }

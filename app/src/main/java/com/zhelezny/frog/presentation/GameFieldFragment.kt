@@ -30,9 +30,9 @@ class GameFieldFragment : Fragment(R.layout.fragment_game_field) {
         binding = FragmentGameFieldBinding.bind(view)
         setYourColor(color)
         viewLifecycleOwner.lifecycleScope.launch {
-            startGameUseCase.connect("123").collect {
-
-            }
+//            startGameUseCase.connect("123").collect {
+//
+//            }
         }
     }
 

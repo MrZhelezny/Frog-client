@@ -11,7 +11,7 @@ android {
         applicationId "com.zhelezny.frog"
         minSdk 21
         targetSdk 34
-        versionCode 9
+        versionCode 10
         versionName "0.0.3-$versionCode"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

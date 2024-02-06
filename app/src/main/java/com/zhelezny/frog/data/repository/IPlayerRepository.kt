@@ -2,6 +2,7 @@ package com.zhelezny.frog.data.repository
 
 import android.util.Log
 import com.zhelezny.frog.data.storage.PlayerStorage
+import com.zhelezny.frog.data.storage.SharedPrefPlayerStorage
 import com.zhelezny.frog.data.storage.models.PlayerName
 import com.zhelezny.frog.data.storage.models.User
 import com.zhelezny.frog.domain.repository.PlayerRepository
@@ -18,10 +19,8 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import java.net.ConnectException
 
-
-class IPlayerRepository(private val playerStorage: PlayerStorage) : PlayerRepository {
-
-    private val TAG = "IPlayerRepository"
+class IPlayerRepository(private val playerStorage: PlayerStorage, private val ipStorage: SharedPrefPlayerStorage) :
+    PlayerRepository {
 
     override fun saveNickNamePlayer(user: User) {
         playerStorage.save(user)
@@ -39,7 +38,7 @@ class IPlayerRepository(private val playerStorage: PlayerStorage) : PlayerReposi
         runBlocking {
             client.webSocket(
                 method = HttpMethod.Get,
-                host = HOST_ADDRESS,
+                host = ipStorage.getIp(),
                 port = PORT,
                 path = "/getUid"
             ) {
@@ -62,18 +61,21 @@ class IPlayerRepository(private val playerStorage: PlayerStorage) : PlayerReposi
             val client = HttpClient {
                 install(WebSockets)
             }
-            client.webSocket(method = HttpMethod.Get, host = HOST_ADDRESS, port = PORT, path = "/joinGame") {
+            client.webSocket(method = HttpMethod.Get, host = ipStorage.getIp(), port = PORT, path = "/joinGame") {
                 try {
                     Log.d(TAG, "Отправка nickName: $nickName")
                     send(nickName)
                     for (message in incoming) {
                         message as? Frame.Text ?: continue
-                        Log.d(TAG, "Входящее сообщение: ${message.readText()}")
+                        val msg = message.readText()
+                        Log.d(TAG, "Входящее сообщение: $msg")
 
-                        val playerName = Json.decodeFromString<List<PlayerName>>(message.readText())
-                        emit(playerName.map { it.nickname })
-                        Log.d(TAG, "emitим значения во Flow")
-                        if (message.readText().startsWith("Color")) {
+                        if (!msg.startsWith("Color")) {
+                            val playerName = Json.decodeFromString<List<PlayerName>>(message.readText())
+                            emit(playerName.map { it.nickname })
+                            Log.d(TAG, "emitим значения во Flow")
+                        } else {
+                            emit(listOf(message.readText()))
                             client.close()
                         }
                     }
@@ -98,7 +100,7 @@ class IPlayerRepository(private val playerStorage: PlayerStorage) : PlayerReposi
         }
         client.webSocket(
             method = HttpMethod.Get,
-            host = HOST_ADDRESS,
+            host = ipStorage.getIp(),
             port = PORT,
             path = "/joinGame"
         ) {
@@ -123,7 +125,9 @@ class IPlayerRepository(private val playerStorage: PlayerStorage) : PlayerReposi
     }
 
     companion object {
-        private const val HOST_ADDRESS = "192.168.0.108"
-        private const val PORT = 22222
+        private const val TAG = "IPlayerRepository"
+
+        //        private const val HOST_ADDRESS = "192.168.0.108"
+        private const val PORT = 11111
     }
 }

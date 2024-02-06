@@ -1,4 +1,4 @@
-package com.zhelezny.frog.presentation
+package com.zhelezny.frog.presentation.menu
 
 import android.content.Context
 import android.net.ConnectivityManager
@@ -31,7 +31,11 @@ class MenuFragment : Fragment(R.layout.fragment_menu) {
             }
         }
 
-        doubleClickToExit()
+        binding.btSettings.setOnClickListener {
+            findNavController().navigate(R.id.action_menuFragment_to_settingsFragment)
+        }
+
+//        doubleClickToExit()
     }
 
     private fun doubleClickToExit() {
